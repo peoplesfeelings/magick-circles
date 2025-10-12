@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Magick Circle (DOM SVG)</title>
+<style>
+  body {
+    background: #0c0b0d;
+    color: #f5f0e3;
+    font-family: system-ui, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+  }
+  svg {
+    width: 80vmin;
+    height: 80vmin;
+    background: radial-gradient(circle at center, #111 0%, #050505 100%);
+  }
+  button {
+    margin-top: 1rem;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    background: #f5e6c9;
+    color: #111;
+    font-weight: bold;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+<svg id="magickCircle" xmlns="http://www.w3.org/2000/svg"></svg>
+<button id="downloadBtn">Download SVG</button>
+
+<script>
+const SVG_NS = "http://www.w3.org/2000/svg";
+
+function make(tag, attrs) {
+  const el = document.createElementNS(SVG_NS, tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    el.setAttribute(k, v);
+  }
+  return el;
+}
+
+function drawMagickCircle(svg, {
+  size = 900,
+  divisions = 12,
+  step = 5,
+  rings = 5,
+  outerRadius = 420,
+  colors = { line: "#e3dccb", accent: "#ffdca8", bg: "#050507" }
+} = {}) {
+
+  svg.setAttribute("viewBox", `0 0 ${size} ${size}`);
+  svg.innerHTML = ""; // clear old elements
+
+  const cx = size / 2, cy = size / 2, R = outerRadius;
+
+  // background
+  svg.appendChild(make("rect", { width: size, height: size, fill: colors.bg }));
+
+  // rings
+  for (let i = 0; i < rings; i++) {
+    const f = 1 - i / (rings + 1);
+    const r = R * f;
+    svg.appendChild(make("circle", {
+      cx, cy, r,
+      fill: "none",
+      stroke: colors.line,
+      "stroke-width": 2 + (i % 2)
+    }));
+  }
+
+  // spokes
+  for (let i = 0; i < divisions; i++) {
+    const theta = -Math.PI / 2 + i * (2 * Math.PI / divisions);
+    const x1 = cx + (R * 0.18) * Math.cos(theta);
+    const y1 = cy + (R * 0.18) * Math.sin(theta);
+    const x2 = cx + (R * 0.98) * Math.cos(theta);
+    const y2 = cy + (R * 0.98) * Math.sin(theta);
+    svg.appendChild(make("line", {
+      x1, y1, x2, y2,
+      stroke: colors.line,
+      "stroke-width": 1.5
+    }));
+  }
+
+  // star polygon {divisions/step}
+  const rP = R * 0.66;
+  const verts = [];
+  for (let i = 0; i < divisions; i++) {
+    const th = -Math.PI / 2 + i * (2 * Math.PI / divisions);
+    verts.push([cx + rP * Math.cos(th), cy + rP * Math.sin(th)]);
+  }
+
+  const path = make("path", {
+    d: buildStarPath(verts, divisions, step),
+    stroke: colors.accent,
+    "stroke-width": 2,
+    fill: "none"
+  });
+  svg.appendChild(path);
+
+  // dots around outer ring
+  for (let i = 0; i < divisions; i++) {
+    const th = -Math.PI / 2 + i * (2 * Math.PI / divisions);
+    const x = cx + (R * 0.9) * Math.cos(th);
+    const y = cy + (R * 0.9) * Math.sin(th);
+    svg.appendChild(make("circle", { cx: x, cy: y, r: 3.5, fill: colors.accent }));
+  }
+
+  // center circle
+  svg.appendChild(make("circle", {
+    cx, cy, r: R * 0.1,
+    fill: "none",
+    stroke: colors.accent,
+    "stroke-width": 2
+  }));
+}
+
+function buildStarPath(verts, m, k) {
+  let visited = new Set();
+  let i = 0;
+  let d = `M ${verts[0][0].toFixed(2)} ${verts[0][1].toFixed(2)}`;
+  while (!visited.has(i)) {
+    visited.add(i);
+    const [x, y] = verts[i];
+    d += ` L ${x.toFixed(2)} ${y.toFixed(2)}`;
+    i = (i + k) % m;
+  }
+  return d + " Z";
+}
+
+const svg = document.getElementById("magickCircle");
+drawMagickCircle(svg, { divisions: 13, step: 5, rings: 6 });
+
+// download button
+document.getElementById("downloadBtn").addEventListener("click", () => {
+  const serializer = new XMLSerializer();
+  const svgData = serializer.serializeToString(svg);
+  const blob = new Blob([svgData], { type: "image/svg+xml" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "magick_circle.svg";
+  a.click();
+  URL.revokeObjectURL(url);
+});
+</script>
+</body>
+</html>
