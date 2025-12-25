@@ -50,6 +50,10 @@ svg.fade-out {
   transition: color 0.1s linear, --line 0.1s linear;
 }
 
+.presentation-controls {
+  display: none;
+}
+
 /* responsive: stack vertically on small screens */
 @media (max-width: 720px) {
   .wrap {

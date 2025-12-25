@@ -142,6 +142,9 @@ downloadBtn.addEventListener('click', () => {
 
 // Presentation mode
 if (presentationMode) {
+  const presentationControls = document.getElementById('presentationControls');
+  presentationControls.style.display = 'block';
+
   controls.classList.add('minimized');
   chevronBtn.classList.add('closed');
 
@@ -259,7 +262,6 @@ if (presentationMode) {
   // Button handlers
   const stopBtn = document.getElementById('stopBtn');
   const nextBtn = document.getElementById('nextBtn');
-  const presentationControls = document.getElementById('presentationControls');
 
   nextBtn.addEventListener('click', () => manualTransition());
   stopBtn.addEventListener('click', () => {
