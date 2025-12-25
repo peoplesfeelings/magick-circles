@@ -1,0 +1,10 @@
+{
+  "main": "index.js",
+  "scripts": {
+    "deploy": "bash -l scripts/deploy.sh",
+    "serve": "serve src"
+  },
+  "devDependencies": {
+    "serve": "^14.2.5"
+  }
+}
