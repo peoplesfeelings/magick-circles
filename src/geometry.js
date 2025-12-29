@@ -33,8 +33,10 @@ export function pathFromVerts(verts, step = 1) {
   return parts.join(' ');
 }
 
-// descriptor: key maps to state key, n = vertices, step = default step (1 for polygon), rotation
-export const shapeDescriptors = [
+// n is vertices. 
+// step is 1 for polygon or higher for a star polygon. 
+// optional components property for composite shapes.
+export const polygons = [
   { key: 'triangleUp', n: 3, step: 1, rotation: -Math.PI/2 },
   { key: 'tetragram', n: 4, step: 1, rotation: -Math.PI/2 },
   { key: 'hexagon', n: 6, step: 1, rotation: -Math.PI/2 },

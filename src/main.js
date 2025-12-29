@@ -1,10 +1,10 @@
-import { regularVerts, shapeDescriptors, createPathElement, createCircle } from './geometry.js';
+import { regularVerts, polygons, createPathElement, createCircle } from './geometry.js?v=2';
 import { Animator } from './animBase.js';
 import { ColorShift, TextContrast } from './colorShift.js';
 
 // state
 window.state = {};
-shapeDescriptors.forEach(d => window.state[d.key] = false);
+polygons.forEach(d => window.state[d.key] = false);
 
 // Stroke width: single base value (scaled proportionally with size)
 const BASE_STROKE = 3;
@@ -60,7 +60,7 @@ function draw(sz) {
   // background outer circle
   svg.appendChild(createCircle(cx, cy, outerR, strokeWidth));
 
-  for (const d of shapeDescriptors) {
+  for (const d of polygons) {
     if (!window.state[d.key]) continue;
 
     if (d.components) {
@@ -84,7 +84,7 @@ chevronBtn.addEventListener('click', (e) => {
 });
 // Generic shape visibility toggles
 (function installGenericToggles() {
-  shapeDescriptors.forEach(d => {
+  polygons.forEach(d => {
     const name = d.key;
     const el = document.querySelector(`input[name="${name}"]`);
     if (!el) return;
@@ -160,16 +160,28 @@ if (presentationMode) {
   };
   requestWakeLock();
 
+  const handleVisibilityChange = async () => {
+    if (document.visibilityState === 'visible') {
+      await requestWakeLock();
+    }
+  };
+  document.addEventListener('visibilitychange', handleVisibilityChange);
+
   const combos = [
     ['doubleSquare', 'hexagon'],
     ['nonagon', 'nonagram_9_2', 'nonagram_9_4', 'tripleTriangle'],
-    ['doubleTriangle', 'tetragram', 'pentagram', 'pentagon', 'heptagram_7_2', 'heptagram_7_3', 'heptagon'],
-    ['heptagram_7_3', 'nonagram_9_4'],
-    ['tetragram', 'pentagon', 'hexagon', 'heptagon', 'octagon', 'nonagon', 'heptagram_7_2', 'nonagram_9_2'],
+    ['pentagram', 'pentagon', 'heptagram_7_2', 'heptagram_7_3', 'heptagon'],
+    ['heptagram_7_2', 'nonagram_9_2'],
     ['triangleUp', 'hexagon', 'nonagram_9_2'],
-    ['hexagon', 'octagon','triangleUp', 'tetragram'],
     ['hexagon', 'heptagram_7_3', 'nonagram_9_2'],
     ['tripleTriangle', 'pentagon', 'heptagram_7_2'],
+    ['heptagon','heptagram_7_2','heptagram_7_3' ],
+    ['hexagon','triangleUp' ],
+    ['octagram','octagon','doubleSquare'],
+    ['tripleTriangle','nonagram_9_2'],
+    ['hexagon','heptagon','octagon','nonagon'],
+    ['doubleTriangle','nonagram_9_4'],
+    ['pentagram','heptagram_7_3','nonagram_9_4']
   ];
 
   let comboIndex = Math.floor(Math.random() * combos.length);
@@ -217,7 +229,7 @@ if (presentationMode) {
     });
 
     // Update UI checkboxes
-    shapeDescriptors.forEach(d => {
+    polygons.forEach(d => {
       const el = document.querySelector(`input[name="${d.key}"]`);
       if (el) el.checked = window.state[d.key];
     });
@@ -263,10 +275,18 @@ if (presentationMode) {
   const stopBtn = document.getElementById('stopBtn');
   const nextBtn = document.getElementById('nextBtn');
 
+  const handleKeydown = (e) => {
+    if (e.key === 'f' || e.key === 'F') {
+      manualTransition();
+    }
+  };
+
   nextBtn.addEventListener('click', () => manualTransition());
   stopBtn.addEventListener('click', () => {
     stopTimer();
     svg.removeEventListener('click', manualTransition);
+    document.removeEventListener('visibilitychange', handleVisibilityChange);
+    document.removeEventListener('keydown', handleKeydown);
     presentationControls.style.display = 'none';
     if (wakeLock) {
       wakeLock.release().then(() => {
@@ -275,9 +295,5 @@ if (presentationMode) {
     }
   });
 
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'f' || e.key === 'F') {
-      manualTransition();
-    }
-  });
+  document.addEventListener('keydown', handleKeydown);
 }
