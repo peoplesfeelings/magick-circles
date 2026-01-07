@@ -168,18 +168,17 @@ if (presentationMode) {
   document.addEventListener('visibilitychange', handleVisibilityChange);
 
   const combos = [
-    ['doubleSquare', 'hexagon'],
     ['nonagon', 'nonagram_9_2', 'nonagram_9_4', 'tripleTriangle'],
     ['pentagram', 'pentagon', 'heptagram_7_2', 'heptagram_7_3', 'heptagon'],
-    ['heptagram_7_2', 'nonagram_9_2'],
+    ['heptagon', 'heptagram_7_2', 'nonagon', 'nonagram_9_2'],
     ['triangleUp', 'hexagon', 'nonagram_9_2'],
     ['hexagon', 'heptagram_7_3', 'nonagram_9_2'],
     ['tripleTriangle', 'pentagon', 'heptagram_7_2'],
-    ['heptagon','heptagram_7_2','heptagram_7_3' ],
+    ['heptagram_7_2', 'nonagram_9_4' ],
     ['hexagon','triangleUp' ],
-    ['octagram','octagon','doubleSquare'],
+    ['octagon','doubleSquare'],
     ['tripleTriangle','nonagram_9_2'],
-    ['hexagon','heptagon','octagon','nonagon'],
+    ['pentagon', 'hexagon','heptagon','octagon','nonagon'],
     ['doubleTriangle','nonagram_9_4'],
     ['pentagram','heptagram_7_3','nonagram_9_4']
   ];
